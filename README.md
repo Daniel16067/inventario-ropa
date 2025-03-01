@@ -1,1 +1,1 @@
-git clone https://github.com/tu-usuario/inventario-ropa.git
+git clone https://github.com/Daniel16067/inventario-ropa.git
