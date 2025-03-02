@@ -2,7 +2,7 @@
 class Producto {
     constructor(nombre, cantidad, precio) {
         if (this.constructor === Producto) {
-            throw new Error("No se puede instanciar una clase abstracta");
+            throw new Error("No se puede instanciar una clase abstracta.");
         }
         this._nombre = nombre;
         this._cantidad = cantidad;
@@ -21,7 +21,7 @@ class Producto {
 
     // Método abstracto
     mostrar() {
-        throw new Error("Método abstracto, debe ser implementado en la subclase");
+        throw new Error("Método abstracto, debe ser implementado en la subclase.");
     }
 }
 
@@ -33,18 +33,22 @@ class ProductoInventario extends Producto {
 
     // Implementación del método mostrar (Polimorfismo)
     mostrar() {
-        return `<td>${this.nombre}</td><td>${this.cantidad}</td><td>${this.precio}</td>`;
+        return `
+            <td>${this.nombre}</td>
+            <td>${this.cantidad}</td>
+            <td>${this.precio}</td>
+        `;
     }
 }
 
-// Controlador del inventario
+// Clase para manejar el inventario
 class Inventario {
     constructor() {
         this.productos = JSON.parse(localStorage.getItem("inventario")) || [];
         this.editIndex = -1;
         this.tabla = document.querySelector("#tablaInventario tbody");
         this.form = document.getElementById("formProducto");
-        this.submitBtn = document.getElementById("submitBtn");
+        this.submitBtn = this.form.querySelector("button");
 
         // Eventos
         document.addEventListener("DOMContentLoaded", () => this.mostrarInventario());
@@ -70,7 +74,7 @@ class Inventario {
         } else {
             this.productos[this.editIndex] = nuevoProducto;
             this.editIndex = -1;
-            this.submitBtn.innerText = "Agregar";
+            this.submitBtn.innerText = "Agregar Producto";
         }
 
         localStorage.setItem("inventario", JSON.stringify(this.productos));
@@ -103,15 +107,14 @@ class Inventario {
     editarProducto(index) {
         let producto = this.productos[index];
 
-        document.getElementById("nombre").value = producto._nombre;
-        document.getElementById("cantidad").value = producto._cantidad;
-        document.getElementById("precio").value = producto._precio;
+        document.getElementById("nombre").value = producto.nombre;
+        document.getElementById("cantidad").value = producto.cantidad;
+        document.getElementById("precio").value = producto.precio;
 
         this.editIndex = index;
-        this.submitBtn.innerText = "Actualizar";
+        this.submitBtn.innerText = "Actualizar Producto";
     }
 }
 
 // Instancia del inventario
 const inventario = new Inventario();
-
