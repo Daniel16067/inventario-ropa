@@ -4,34 +4,23 @@ class Producto {
         if (this.constructor === Producto) {
             throw new Error("No se puede instanciar una clase abstracta.");
         }
-        this._nombre = nombre;
-        this._cantidad = cantidad;
-        this._precio = precio;
+        this.nombre = nombre;
+        this.cantidad = cantidad;
+        this.precio = precio;
     }
 
-    // Métodos Getters y Setters (Encapsulamiento)
-    get nombre() { return this._nombre; }
-    set nombre(nombre) { this._nombre = nombre; }
-
-    get cantidad() { return this._cantidad; }
-    set cantidad(cantidad) { this._cantidad = cantidad; }
-
-    get precio() { return this._precio; }
-    set precio(precio) { this._precio = precio; }
-
-    // Método abstracto
     mostrar() {
         throw new Error("Método abstracto, debe ser implementado en la subclase.");
     }
 }
 
-// Clase que hereda de Producto
+// Clase que hereda de Producto (Herencia)
 class ProductoInventario extends Producto {
     constructor(nombre, cantidad, precio) {
         super(nombre, cantidad, precio);
     }
 
-    // Implementación del método mostrar (Polimorfismo)
+    // Polimorfismo: Implementación del método mostrar()
     mostrar() {
         return `
             <td>${this.nombre}</td>
@@ -41,10 +30,10 @@ class ProductoInventario extends Producto {
     }
 }
 
-// Clase para manejar el inventario
+// Clase para manejar el inventario (Encapsulamiento)
 class Inventario {
     constructor() {
-        this.productos = JSON.parse(localStorage.getItem("inventario")) || [];
+        this.productos = this.obtenerInventario();
         this.editIndex = -1;
         this.tabla = document.querySelector("#tablaInventario tbody");
         this.form = document.getElementById("formProducto");
@@ -55,6 +44,18 @@ class Inventario {
         this.form.addEventListener("submit", (event) => this.guardarProducto(event));
     }
 
+    // Obtener datos del localStorage
+    obtenerInventario() {
+        const data = localStorage.getItem("inventario");
+        return data ? JSON.parse(data).map(obj => new ProductoInventario(obj.nombre, obj.cantidad, obj.precio)) : [];
+    }
+
+    // Guardar datos en localStorage
+    guardarInventario() {
+        localStorage.setItem("inventario", JSON.stringify(this.productos));
+    }
+
+    // Guardar o actualizar producto
     guardarProducto(event) {
         event.preventDefault();
         
@@ -77,15 +78,14 @@ class Inventario {
             this.submitBtn.innerText = "Agregar Producto";
         }
 
-        localStorage.setItem("inventario", JSON.stringify(this.productos));
+        this.guardarInventario();
         this.form.reset();
         this.mostrarInventario();
     }
 
+    // Mostrar los productos en la tabla
     mostrarInventario() {
         this.tabla.innerHTML = "";
-        this.productos = JSON.parse(localStorage.getItem("inventario")) || [];
-
         this.productos.forEach((producto, index) => {
             let fila = document.createElement("tr");
             fila.innerHTML = producto.mostrar() + `
@@ -98,12 +98,14 @@ class Inventario {
         });
     }
 
+    // Eliminar producto
     eliminarProducto(index) {
         this.productos.splice(index, 1);
-        localStorage.setItem("inventario", JSON.stringify(this.productos));
+        this.guardarInventario();
         this.mostrarInventario();
     }
 
+    // Editar producto
     editarProducto(index) {
         let producto = this.productos[index];
 
@@ -116,5 +118,5 @@ class Inventario {
     }
 }
 
-// Instancia del inventario
+// Instancia global del inventario
 const inventario = new Inventario();
