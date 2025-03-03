@@ -2,31 +2,31 @@ document.addEventListener("DOMContentLoaded", mostrarInventario);
 
 const form = document.getElementById("formProducto");
 const tabla = document.querySelector("#tablaInventario tbody");
+const totalInventario = document.getElementById("totalInventario");
+const submitBtn = document.querySelector("button[type='submit']");
 
-let editIndex = -1; // Variable para rastrear el índice del producto a editar
+let editIndex = -1;
 
 form.addEventListener("submit", function (event) {
-    event.preventDefault();
-    
-    let nombre = document.getElementById("nombre").value.trim();
-    let cantidad = document.getElementById("cantidad").value.trim();
-    let precio = document.getElementById("precio").value.trim();
+    event.preventDefault();               
 
-    if (!nombre || !cantidad || !precio) {
-        alert("Por favor, complete todos los campos.");
+    let nombre = document.getElementById("nombre").value.trim();
+    let cantidad = parseInt(document.getElementById("cantidad").value.trim(), 10);
+    let precio = parseFloat(document.getElementById("precio").value.trim());
+
+    if (!nombre || isNaN(cantidad) || isNaN(precio) || cantidad < 1 || precio < 0) {
+        alert("Por favor, complete todos los campos correctamente.");
         return;
     }
 
     let productos = JSON.parse(localStorage.getItem("inventario")) || [];
 
     if (editIndex === -1) {
-        // Agregar nuevo producto
         productos.push({ nombre, cantidad, precio });
     } else {
-        // Editar producto existente
         productos[editIndex] = { nombre, cantidad, precio };
-        editIndex = -1; // Reiniciar índice de edición
-        document.getElementById("submitBtn").innerText = "Agregar";
+        editIndex = -1;
+        submitBtn.innerText = "Agregar Producto";
     }
 
     localStorage.setItem("inventario", JSON.stringify(productos));
@@ -38,20 +38,34 @@ form.addEventListener("submit", function (event) {
 function mostrarInventario() {
     tabla.innerHTML = "";
     let productos = JSON.parse(localStorage.getItem("inventario")) || [];
+    let total = 0;
 
     productos.forEach((producto, index) => {
+        let valorTotal = producto.cantidad * producto.precio;
+        total += valorTotal;
+
         let fila = document.createElement("tr");
         fila.innerHTML = `
             <td>${producto.nombre}</td>
             <td>${producto.cantidad}</td>
-            <td>${producto.precio}</td>
+            <td>$${producto.precio.toFixed(2)}</td>
+            <td>$${valorTotal.toFixed(2)}</td>
             <td>
-                <button onclick="editarProducto(${index})">Editar</button>
-                <button onclick="eliminarProducto(${index})">Eliminar</button>
+                <button class="editar" data-index="${index}" aria-label="Editar ${producto.nombre}">✏️</button>
+                <button class="eliminar" data-index="${index}" aria-label="Eliminar ${producto.nombre}">🗑️</button>
             </td>
         `;
         tabla.appendChild(fila);
     });
+
+    totalInventario.innerHTML = `<strong>Total del Inventario:</strong> $${total.toFixed(2)}`;
+
+    document.querySelectorAll(".editar").forEach(btn => 
+        btn.addEventListener("click", () => editarProducto(btn.dataset.index))
+    );
+    document.querySelectorAll(".eliminar").forEach(btn => 
+        btn.addEventListener("click", () => eliminarProducto(btn.dataset.index))
+    );
 }
 
 function eliminarProducto(index) {
@@ -69,6 +83,6 @@ function editarProducto(index) {
     document.getElementById("cantidad").value = producto.cantidad;
     document.getElementById("precio").value = producto.precio;
 
-    editIndex = index; // Guardar el índice para la edición
-    document.getElementById("submitBtn").innerText = "Actualizar";
+    editIndex = index;
+    submitBtn.innerText = "Actualizar Producto";
 }
