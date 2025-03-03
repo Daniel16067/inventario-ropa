@@ -1,22 +1,3 @@
-document.addEventListener("DOMContentLoaded", mostrarInventario);
-
-const form = document.getElementById("formProducto");
-const tabla = document.querySelector("#tablaInventario tbody");
-
-let editIndex = -1; // Variable para rastrear el índice del producto a editar
-
-form.addEventListener("submit", function (event) {
-    event.preventDefault();               
-    let nombre = document.getElementById("nombre").value.trim();
-    let cantidad = document.getElementById("cantidad").value.trim();
-    let precio = document.getElementById("precio").value.trim();
-
-    if (!nombre || !cantidad || !precio) {
-        alert("Por favor, complete todos los campos.");
-        return;
-    }
-
-    let productos = JSON.parse(localStorage.getItem("inventario")) || [];
 
     if (editIndex === -1) {
         // Agregar nuevo producto
