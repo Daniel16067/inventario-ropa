@@ -3,12 +3,12 @@ document.addEventListener("DOMContentLoaded", mostrarInventario);
 const form = document.getElementById("formProducto");
 const tabla = document.querySelector("#tablaInventario tbody");
 const totalInventario = document.getElementById("totalInventario");
-const submitBtn = document.querySelector("button[type='submit']");
+const submitBtn = document.getElementById("submitBtn");
 
 let editIndex = -1;
 
 form.addEventListener("submit", function (event) {
-    event.preventDefault();               
+    event.preventDefault();
 
     let nombre = document.getElementById("nombre").value.trim();
     let cantidad = parseInt(document.getElementById("cantidad").value.trim(), 10);
@@ -30,7 +30,7 @@ form.addEventListener("submit", function (event) {
     }
 
     localStorage.setItem("inventario", JSON.stringify(productos));
-    
+
     form.reset();
     mostrarInventario();
 });
@@ -38,11 +38,11 @@ form.addEventListener("submit", function (event) {
 function mostrarInventario() {
     tabla.innerHTML = "";
     let productos = JSON.parse(localStorage.getItem("inventario")) || [];
-    let total = 0;
+    let total = 0; // Variable para almacenar el total del inventario
 
     productos.forEach((producto, index) => {
         let valorTotal = producto.cantidad * producto.precio;
-        total += valorTotal;
+        total += valorTotal; // Sumar el valor total del producto al total del inventario
 
         let fila = document.createElement("tr");
         fila.innerHTML = `
@@ -58,12 +58,14 @@ function mostrarInventario() {
         tabla.appendChild(fila);
     });
 
+    // Mostrar el total del inventario
     totalInventario.innerHTML = `<strong>Total del Inventario:</strong> $${total.toFixed(2)}`;
 
-    document.querySelectorAll(".editar").forEach(btn => 
+    // Delegación de eventos para botones de edición y eliminación
+    document.querySelectorAll(".editar").forEach(btn =>
         btn.addEventListener("click", () => editarProducto(btn.dataset.index))
     );
-    document.querySelectorAll(".eliminar").forEach(btn => 
+    document.querySelectorAll(".eliminar").forEach(btn =>
         btn.addEventListener("click", () => eliminarProducto(btn.dataset.index))
     );
 }
